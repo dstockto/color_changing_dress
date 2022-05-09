@@ -151,16 +151,13 @@ void loop() {
       blue = buf[3];
       white = buf[4];
 
+      char reply[80];
       Serial.printf("Got %c R: %d G: %d B: %d W: %d\n", buf[0], red, green, blue, white);
+      sprintf(reply, "Got %c R: %d G: %d B: %d W: %d\n", buf[0], red, green, blue, white);
 
-      if (strstr((char *)buf, "Hello World")) {
-        // Send a reply!
-        uint8_t data[] = "And hello back to you";
-        rf69.send(data, sizeof(data));
-        rf69.waitPacketSent();
-        Serial.println("Sent a reply");
-        Blink(LED, 40, 3); //blink LED 3 times, 40ms between blinks
-      }
+      rf69.send((uint8_t *)reply, strlen(reply));
+      rf69.waitPacketSent();
+      Blink(LED, 40, 3);
     } else {
       Serial.println("Receive failed");
     }
