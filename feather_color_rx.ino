@@ -8,6 +8,9 @@
 // Demonstrates the use of AES encryption, setting the frequency and modem 
 // configuration
 
+// TODO add on/off
+// TODO add pixie strip
+
 #include <SPI.h>
 #include <RH_RF69.h>
 
