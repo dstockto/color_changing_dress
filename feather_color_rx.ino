@@ -32,8 +32,11 @@ SoftwareSerial pixieSerial(-1, PIXIEPIN);
 
 #endif
 
-#define NUMPIXIES = 6
-Adafruit_Pixie strip = AdaFruit_Pixie(NUMPIXIES, &pixieSerial);
+#define NUMPIXIES 6
+Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXIES, &pixieSerial);
+
+unsigned long lastReceivedTime = 0;
+unsigned long now = 0;
 
 /************ Radio Setup ***************/
 
@@ -160,6 +163,7 @@ void setup()
 
 
 void loop() {
+  char red, green, blue, white;
  if (rf69.available()) {
     // Should be a message for us now   
     uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
@@ -174,7 +178,7 @@ void loop() {
       Serial.print("RSSI: ");
       Serial.println(rf69.lastRssi(), DEC);
 
-      char red, green, blue, white;
+      
       red = buf[1];
       green = buf[2];
       blue = buf[3];
@@ -187,14 +191,24 @@ void loop() {
       rf69.send((uint8_t *)reply, strlen(reply));
       rf69.waitPacketSent();
 
-      for (int i = 0; i < NUMPIXELS; i++) {
+      for (int i = 0; i < NUMPIXIES; i++) {
         strip.setPixelColor(i, red, green, blue);
       }
       strip.show();
       
       Blink(LED, 40, 3);
+      lastReceivedTime = millis();
     } else {
       Serial.println("Receive failed");
+    }
+  } else {
+    now = millis();
+    if (lastReceivedTime - now >= 1500) {
+      for (int i = 0; i < NUMPIXIES; i++) {
+        strip.setPixelColor(i, red, green, blue);
+      }
+      strip.show();
+      lastReceivedTime = now;
     }
   }
 }
