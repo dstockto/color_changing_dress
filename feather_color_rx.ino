@@ -10,9 +10,30 @@
 
 // TODO add on/off
 // TODO add pixie strip
+// TODO - send color every 1.5s if no new color 
 
 #include <SPI.h>
 #include <RH_RF69.h>
+#include "Adafruit_Pixie.h"
+
+
+#if (defined(__AVR__) || defined(ESP8266)) && !defined(__AVR_ATmega2560__)
+// For UNO and others without hardware serial, we must use software serial...
+// Set up the serial port to use softwareserial..
+
+#include "SoftwareSerial.h"
+#define PIXIEPIN  6 // Pin number for SoftwareSerial output
+SoftwareSerial pixieSerial(-1, PIXIEPIN);
+
+#else
+// On Leonardo/M0/etc, others with hardware serial, use hardware serial!
+// #0 is green wire, #1 is white
+#define pixieSerial Serial1
+
+#endif
+
+#define NUMPIXIES = 6
+Adafruit_Pixie strip = AdaFruit_Pixie(NUMPIXIES, &pixieSerial);
 
 /************ Radio Setup ***************/
 
@@ -90,8 +111,13 @@ int16_t packetnum = 0;  // packet counter, we increment per xmission
 
 void setup() 
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  Serial.println("Ready to Pixie!");
   //while (!Serial) { delay(1); } // wait until serial console is open, remove if not tethered to computer
+
+  pixieSerial.begin(115200);
+
+  strip.setBrightness(200); // Adjust brightness
 
   pinMode(LED, OUTPUT);     
   pinMode(RFM69_RST, OUTPUT);
@@ -160,6 +186,12 @@ void loop() {
 
       rf69.send((uint8_t *)reply, strlen(reply));
       rf69.waitPacketSent();
+
+      for (int i = 0; i < NUMPIXELS; i++) {
+        strip.setPixelColor(i, red, green, blue);
+      }
+      strip.show();
+      
       Blink(LED, 40, 3);
     } else {
       Serial.println("Receive failed");
