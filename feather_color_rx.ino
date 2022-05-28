@@ -32,7 +32,7 @@ SoftwareSerial pixieSerial(-1, PIXIEPIN);
 
 #endif
 
-#define NUMPIXIES 6
+#define NUMPIXIES 8
 Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXIES, &pixieSerial);
 
 unsigned long lastReceivedTime = 0;
@@ -120,7 +120,7 @@ void setup()
 
   pixieSerial.begin(115200);
 
-  strip.setBrightness(200); // Adjust brightness
+  strip.setBrightness(100); // Adjust brightness
 
   pinMode(LED, OUTPUT);     
   pinMode(RFM69_RST, OUTPUT);
@@ -185,7 +185,7 @@ void loop() {
       white = buf[4];
 
       char reply[80];
-      Serial.printf("Got %c R: %d G: %d B: %d W: %d\n", buf[0], red, green, blue, white);
+      Serial.printf("%d: Got %c R: %d G: %d B: %d W: %d\n", millis(), buf[0], red, green, blue, white);
       sprintf(reply, "Got %c R: %d G: %d B: %d W: %d\n", buf[0], red, green, blue, white);
 
       rf69.send((uint8_t *)reply, strlen(reply));
@@ -203,7 +203,9 @@ void loop() {
     }
   } else {
     now = millis();
-    if (lastReceivedTime - now >= 1500) {
+    if (now - lastReceivedTime >= 1500) {
+      Serial.printf("Now %d, Then: %d\n", now, lastReceivedTime);
+      Serial.printf("refreshing color %d, %d, %d\n", red, green, blue);
       for (int i = 0; i < NUMPIXIES; i++) {
         strip.setPixelColor(i, red, green, blue);
       }
