@@ -121,7 +121,7 @@ void setup()
 
   pixieSerial.begin(115200);
 
-  strip.setBrightness(75); // Adjust brightness
+  strip.setBrightness(100); // Adjust brightness
 
   pinMode(LED, OUTPUT);
   pinMode(RFM69_RST, OUTPUT);
