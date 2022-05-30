@@ -12,29 +12,12 @@
 
 #include <SPI.h>
 #include <RH_RF69.h>
-#include "Adafruit_Pixie.h"
+#include <Adafruit_NeoPixel.h>
 
 
-#if (defined(__AVR__) || defined(ESP8266)) && !defined(__AVR_ATmega2560__)
-// For UNO and others without hardware serial, we must use software serial...
-// Set up the serial port to use softwareserial..
-
-#include "SoftwareSerial.h"
-#define PIXIEPIN  6 // Pin number for SoftwareSerial output
-SoftwareSerial pixieSerial(-1, PIXIEPIN);
-
-#else
-// On Leonardo/M0/etc, others with hardware serial, use hardware serial!
-// #0 is green wire, #1 is white
-#define pixieSerial Serial1
-
-#endif
-
-#define NUMPIXIES 8
-Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXIES, &pixieSerial);
-
-unsigned long lastReceivedTime = 0;
-unsigned long now = 0;
+#define LED_COUNT 20
+#define LED_PIN 12
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 /************ Radio Setup ***************/
 
@@ -119,9 +102,9 @@ void setup()
   Serial.println("Ready to Pixie!");
   //while (!Serial) { delay(1); } // wait until serial console is open, remove if not tethered to computer
 
-  pixieSerial.begin(115200);
-
-  strip.setBrightness(100); // Adjust brightness
+  strip.begin();
+  strip.show();
+  strip.setBrightness(255); // Adjust brightness
 
   pinMode(LED, OUTPUT);
   pinMode(RFM69_RST, OUTPUT);
@@ -202,7 +185,6 @@ void loop() {
       //      strip.show();
 
       Blink(LED, 40, 3);
-      lastReceivedTime = millis();
     } else {
       Serial.println("Receive failed");
     }
@@ -215,8 +197,8 @@ void loop() {
 
 
 void setStrip(char red, char green, char blue) {
-  for (int i = 0; i < NUMPIXIES; i++) {
-    strip.setPixelColor(i, red, green, blue);
+  for (int i = 0; i < LED_COUNT; i++) { 
+    strip.setPixelColor(i, strip.Color((int)red, (int)green, (int)blue));
   }
   strip.show();
 }
