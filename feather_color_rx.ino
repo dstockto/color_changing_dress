@@ -99,7 +99,6 @@ void setStrip(char red, char green, char blue);
 void setup()
 {
   Serial.begin(9600);
-  Serial.println("Ready to Pixie!");
   //while (!Serial) { delay(1); } // wait until serial console is open, remove if not tethered to computer
 
   strip.begin();
@@ -144,9 +143,10 @@ void setup()
   pinMode(LED, OUTPUT);
 
   Serial.print("RFM69 radio @");  Serial.print((int)RF69_FREQ);  Serial.println(" MHz");
+  setStrip(0, 0, 255);
 }
 
-char red, green, blue, white;
+char red = 255, green = 255, blue = 255, white = 0;
 
 void loop() {
 
@@ -197,8 +197,10 @@ void loop() {
 
 
 void setStrip(char red, char green, char blue) {
-  for (int i = 0; i < LED_COUNT; i++) { 
+  for (int i = 0; i < LED_COUNT; i++) {
     strip.setPixelColor(i, strip.Color((int)red, (int)green, (int)blue));
+    //    strip.show();
+    //    delay(50);
   }
   strip.show();
 }
