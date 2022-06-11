@@ -184,7 +184,7 @@ void loop() {
         }
     } else {
         // We are setting the color to the strip every 1500ms if we don't get a new color we send what we had last time
-        // to the strip. This is helpful if you end up using NeoPixies (very, very bright and powerful) since they must
+        // to the strip. This is helpful if you end up using Pixies (very, very bright and powerful) since they must
         // be refreshed regularly. They will shut off automatically at 2 seconds since the last time they received an
         // instruction. If you're using neopixels, you can remove this block. It doesn't hurt anything, it's just not
         // needed.
